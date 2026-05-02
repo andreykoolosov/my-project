@@ -3,7 +3,6 @@ from fastapi import FastAPI, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-
 app = FastAPI()
 
 app.add_middleware(
@@ -39,8 +38,27 @@ def read_tasks() -> list[TaskSchema]:
 
 
 @app.post("/tasks", response_model=TaskSchema, status_code=status.HTTP_201_CREATED)
-def create_tasks(payload: TaskCreateSchema) -> TaskSchema:
+def create_task(payload: TaskCreateSchema) -> TaskSchema:
     new_task = TaskSchema(
         id=str(uuid4()), title=payload.title, completed=False)
     tasks.append(new_task)
     return new_task
+
+
+class BookCreate(BaseModel):
+    book: str
+
+
+book = None
+
+
+@app.get("/book")
+def read_book():
+    return f"Любимая книга: {book}"
+
+
+@app.post("/book")
+def create_book(payload: BookCreate) -> str:
+    global book
+    book = payload.book
+    return book
