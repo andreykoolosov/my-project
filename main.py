@@ -5,9 +5,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped, mapped_column, Session
+import uvicorn
+import os
 
 
-DATABASE_URL = "postgresql+psycopg://postgres:admin@127.0.0.1:15432/postgres"
+DATABASE_URL = os.getenv(
+    "DATABASE_URL", "postgresql+psycopg://postgres:admin@localhost:15432/postgres")
 engine = create_engine(DATABASE_URL)
 Sessionlocal = sessionmaker(bind=engine)  # создаем фабрику сессий
 
@@ -166,3 +169,7 @@ def delete_category(category_id: str, db: Session = Depends(get_db)) -> None:
         raise HTTPException(status_code=404, detail="Category not found")
     db.delete(category_for_delete)
     db.commit()
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", reload=True, port=8080, host="0.0.0.0")
