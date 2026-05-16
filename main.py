@@ -9,13 +9,15 @@ import uvicorn
 import os
 
 
+# юрл подключения к БД
 DATABASE_URL = os.getenv(
     "DATABASE_URL", "postgresql+psycopg://postgres:admin@localhost:15432/postgres")
+# это мост между ORM (SQLAlchemy) и базой данных.
 engine = create_engine(DATABASE_URL)
 Sessionlocal = sessionmaker(bind=engine)  # создаем фабрику сессий
 
 
-class Base(DeclarativeBase):
+class Base(DeclarativeBase):  # родительный класс
     id: Mapped[str] = mapped_column(
         primary_key=True, default=lambda: str(uuid4()))
 
@@ -32,6 +34,9 @@ class CategoryORM(Base):
 
     name: Mapped[str]
 
+# что делать при открытии и закрытии приложения
+# создает таблицы от класса Base, если их еще нет
+
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -45,10 +50,11 @@ app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000",],
-    allow_methods=["*"],
-    allow_headers=["*"],
-    allow_credentials=True,
+    # пускаем только фронт с порта 3000
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["*"],  # разрешаем все методы (GET, POST...)
+    allow_headers=["*"],  # разрешаем любые заголовки
+    allow_credentials=True,  # разрешаем отправлять куки
 )
 
 
@@ -81,10 +87,12 @@ class CategoryUpdateSchema(BaseModel):
 
 
 def get_db():
+    # Создаёт и возвращает сессию SQLAlchemy для работы с БД.
     db = Sessionlocal()
     try:
         yield db
     finally:
+        # Автоматически закрывает сессию после завершения работы.
         db.close()
 
 
