@@ -1,0 +1,47 @@
+from fastapi import APIRouter, status, Depends, HTTPException
+from app.services.category import CategoryService, CategoryNotFoundError
+from app.api.dependencies import get_category_service
+from app.schemas.category import CategorySchema, CategoryCreateSchema, CategoryUpdateSchema
+
+router = APIRouter(prefix="/categories", tags=["categories"])
+
+
+@router.get("", response_model=list[CategorySchema])
+def read_categories(
+    category_service: CategoryService = Depends(get_category_service)
+) -> list[CategorySchema]:
+
+    return category_service.list_category()
+
+
+@router.post("", response_model=CategorySchema, status_code=status.HTTP_201_CREATED)
+def create_category(
+    payload: CategoryCreateSchema,
+    category_service: CategoryService = Depends(get_category_service)
+) -> CategorySchema:
+
+    return category_service.create_category(category_create=payload)
+
+
+@router.patch("/{category_id}", response_model=CategorySchema)
+def update_category(
+    category_id: str,
+    payload: CategoryUpdateSchema,
+    category_service: CategoryService = Depends(get_category_service)
+) -> CategorySchema:
+    try:
+        return category_service.update_category(
+            category_id=category_id, category_update=payload)
+    except CategoryNotFoundError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+
+@router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_category(
+    category_id: str,
+    category_service: CategoryService = Depends(get_category_service)
+) -> None:
+    try:
+        category_service.delete_category(category_id=category_id)
+    except CategoryNotFoundError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
