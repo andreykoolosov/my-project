@@ -1,14 +1,12 @@
-from dataclasses import dataclass
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import field_validator
 
 
-@dataclass(frozen=True)
-class Settings:
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env")
+
     DATABASE_URL: str
-    cors_allowed_origin: list[str]
+    CORS_ALLOWED_ORIGIN: str
 
 
-def get_settings() -> Settings:
-    return Settings(
-        DATABASE_URL="postgresql+psycopg://postgres:admin@localhost:5432/postgres",
-        cors_allowed_origin=["http://localhost:3000"],
-    )
+settings = Settings()
