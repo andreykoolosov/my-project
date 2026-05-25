@@ -11,7 +11,7 @@ SessionLocal = sessionmaker(
 
 
 def get_db():
-    """ "Функция для инъекции сессии БД"""
+    """Функция для инъекции сессии БД"""
     db = SessionLocal()
     try:
         yield db

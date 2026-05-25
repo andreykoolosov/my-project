@@ -8,4 +8,4 @@ class Settings(BaseSettings):
     CORS_ALLOWED_ORIGIN: str
 
 
-settings = Settings()
+settings = Settings()  # type: ignore[call-arg]
