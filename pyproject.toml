@@ -14,7 +14,6 @@ exclude = [
     "dist",
 ]
 
-
 [tool.ruff.lint]
 # Какие группы правил включены: E - pycodestyle, F - pyflakes, I - сортировка импортов
 select = ["E", "F", "I"]
