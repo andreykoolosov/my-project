@@ -21,5 +21,5 @@ class CategoryRepository:
         self.db.add(new_category)
         return new_category
 
-    def delete_category(self, CategoryORM: CategoryORM) -> None:
-        self.db.delete(CategoryORM)
+    def delete_category(self, category: CategoryORM) -> None:
+        self.db.delete(category)
